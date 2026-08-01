@@ -26,20 +26,16 @@ jobs:
           cache: pip
 
       - name: Install
-        working-directory: server
         run: pip install -e ".[dev]"
 
       - name: Lint
-        working-directory: server
         run: ruff check src tests
 
       - name: Format check
-        working-directory: server
         run: ruff format --check src tests
 
       - name: Test
-        working-directory: server
-        run: pytest -q
+        run: pytest -q --cov --cov-report=term-missing
 
   console:
     name: Console
@@ -76,7 +72,7 @@ jobs:
         uses: docker/build-push-action@v6
         with:
           context: .
-          file: deploy/docker/server.Dockerfile
+          file: Dockerfile
           push: false
           tags: hoursx-server:ci
           cache-from: type=gha

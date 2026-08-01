@@ -30,3 +30,7 @@ plugins/
 .DS_Store
 .idea/
 .vscode/
+
+# Coverage
+.coverage
+coverage.xml

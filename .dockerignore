@@ -1,0 +1,42 @@
+# VCS / CI
+.git
+.github
+.gitignore
+
+# Python build + cache artifacts
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+build/
+dist/
+.venv/
+venv/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+htmlcov/
+.coverage
+
+# Node / frontend (built by its own Dockerfile)
+console/node_modules/
+console/.next/
+console/out/
+node_modules/
+
+# Local runtime state — must never enter an image
+*.sqlite3
+workspaces/
+plugins/
+.env
+.env.local
+
+# Docs and deploy manifests are not needed at runtime
+docs/
+deploy/k8s/
+LICENSE
+
+# Editors / OS
+.DS_Store
+.idea/
+.vscode/

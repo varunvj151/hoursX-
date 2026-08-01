@@ -9,6 +9,6 @@ data:
   HOURSX_PORT: "8400"
   HOURSX_LOG_LEVEL: "INFO"
   HOURSX_LOG_JSON: "true"
-  HOURSX_WORKSPACE_ROOT: "/app/workspaces"
+  HOURSX_WORKSPACE_ROOT: "/var/lib/hoursx/workspaces"
   HOURSX_ALLOW_OPEN_REGISTRATION: "false"
   HOURSX_MAX_RUN_STEPS: "24"

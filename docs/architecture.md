@@ -226,6 +226,34 @@ the server can list a remote index and install from it; no code runs at install 
 - Approval workflow for irreversible or operator-flagged actions.
 - Secrets live only in settings/env; log formatter redacts known secret fields.
 
+## Reliability guarantees
+
+**Single-winner run claiming.** A run transitions to `running` through a
+compare-and-swap (`UPDATE … WHERE id = ? AND status = 'queued'`), and the loop
+proceeds only if it changed exactly one row. Two workers pulling the same job
+cannot both execute it — which matters because agent side effects (files, shell
+commands, spend) are not idempotent.
+
+**Orphan recovery.** Single-winner claiming needs a matching liveness rule: a
+worker that dies mid-run would otherwise leave the row `running` forever. The
+runtime heartbeats each claimed run; a sweep re-queues runs whose heartbeat has
+gone stale. `awaiting_approval` is excluded — it waits on a human, not a worker.
+
+**Cooperative cancellation.** Cancellation sets a flag the loop observes at step
+boundaries rather than killing the task, so a tool never dies half-applied. Runs
+parked on approval are settled directly, since no loop is polling for them.
+
+**Idempotent submission.** A client-supplied idempotency key makes a retried
+submission return the original run instead of starting a second one.
+
+**Provider resilience.** Transient failures (timeouts, 429, 5xx) retry with
+jittered exponential backoff; permanent ones (bad credentials, unknown model)
+fail immediately. Each provider has a circuit breaker, so a dead vendor is
+skipped instantly while a healthy fallback exists.
+
+**Quotas.** Per-workspace concurrency and hourly limits are enforced against the
+database, so the limit holds across API replicas and survives restarts.
+
 ## Deployment
 
 `docker-compose.yml` runs the full stack (PostgreSQL, Redis, API, worker, console).

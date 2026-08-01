@@ -39,7 +39,7 @@ spec:
             allowPrivilegeEscalation: false
             capabilities: { drop: ["ALL"] }
           volumeMounts:
-            - { name: workspaces, mountPath: /app/workspaces }
+            - { name: workspaces, mountPath: /var/lib/hoursx/workspaces }
       volumes:
         - name: workspaces
           emptyDir: {}

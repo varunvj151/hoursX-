@@ -26,6 +26,10 @@ durable afterwards.
 | **Plugin SDK** | Third-party tools via entry points or a local directory, gated by operator-granted permissions |
 | **Multi-user + RBAC** | Workspaces, four roles, JWT and API-key auth, per-route permission checks |
 | **Real-time + durable** | WebSocket and SSE event streams; PostgreSQL as the system of record |
+| **Exactly-once execution** | Compare-and-swap run claiming, heartbeats, and orphan requeue — a crashed worker never means a duplicated or lost run |
+| **Fault tolerance** | Per-provider retry with jittered backoff, circuit breakers, and fallback chains |
+| **Governed by quotas** | Per-workspace concurrency and hourly limits, enforced in the database across replicas |
+| **Auditable** | Append-only trail of membership, credential, approval, and agent changes |
 
 ## Quick start
 
@@ -45,7 +49,6 @@ provider still exercises the full loop end to end.
 
 ```bash
 # Backend (http://localhost:8400, OpenAPI docs at /docs)
-cd server
 pip install -e ".[dev]"
 hoursx db-init
 hoursx serve
@@ -106,22 +109,29 @@ sequenceDiagram
 ## Repository layout
 
 ```
-server/           FastAPI backend
-  src/hoursx/
-    agents.py         run loop (model ⇄ tools, approvals, delegation)
-    orchestration.py  conductor: run creation and dispatch
-    planning.py       goal → step plan
-    memory.py         working / episodic / semantic memory
-    knowledge.py      chunking, embedding, hybrid retrieval
-    tools/            registry, policy executor, built-in tools
-    providers/        model adapters + alias router
-    api/              routers, dependencies, schemas
-    sdk/              plugin manifest, discovery, marketplace
-    db/               SQLAlchemy models and engine
-  tests/            97 unit + integration tests
-console/          Next.js operator console (TypeScript, Tailwind)
-deploy/           Dockerfiles and Kubernetes manifests
-docs/             architecture, API, security, plugin guide
+src/hoursx/         FastAPI backend
+  agents.py           run loop (model ⇄ tools, approvals, delegation)
+  orchestration.py    conductor: run creation, quotas, dispatch, cancellation
+  planning.py         goal → step plan
+  memory.py           working / episodic / semantic memory
+  knowledge.py        chunking, embedding, hybrid retrieval
+  vectorstore.py      VectorStore protocol + SQL and pgvector stores
+  resilience.py       retry policy and circuit breaker
+  recovery.py         orphaned-run requeue (crashed-worker liveness)
+  quotas.py           per-workspace concurrency and rate limits
+  pagination.py       keyset cursors
+  audit.py            append-only trail of consequential actions
+  errors.py           domain error taxonomy → HTTP mapping
+  tools/              registry, policy executor, built-in tools
+  providers/          model adapters + alias router
+  api/                routers, dependencies, schemas
+  sdk/                plugin manifest, discovery, marketplace
+  db/                 SQLAlchemy models and engine
+tests/              250 unit + integration tests
+console/            Next.js operator console (TypeScript, Tailwind)
+Dockerfile          server image (API + worker roles)
+deploy/             console image and Kubernetes manifests
+docs/               architecture, API, security, plugin guide, operations
 ```
 
 ## Documentation
@@ -135,7 +145,7 @@ docs/             architecture, API, security, plugin guide
 ## Testing
 
 ```bash
-cd server && pytest -q          # 97 tests, no network or external services
+pytest -q          # 250 tests, no network or external services
 cd console && npm run typecheck && npm run build
 ```
 

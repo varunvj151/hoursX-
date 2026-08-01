@@ -43,13 +43,13 @@ services:
   api:
     build:
       context: .
-      dockerfile: deploy/docker/server.Dockerfile
+      dockerfile: Dockerfile
     environment: *server-env
     command: ["hoursx", "serve"]
     ports:
       - "8400:8400"
     volumes:
-      - agent-workspaces:/app/workspaces
+      - agent-workspaces:/var/lib/hoursx/workspaces
     depends_on:
       postgres:
         condition: service_healthy
@@ -59,11 +59,11 @@ services:
   worker:
     build:
       context: .
-      dockerfile: deploy/docker/server.Dockerfile
+      dockerfile: Dockerfile
     environment: *server-env
     command: ["hoursx", "worker"]
     volumes:
-      - agent-workspaces:/app/workspaces
+      - agent-workspaces:/var/lib/hoursx/workspaces
     depends_on:
       api:
         condition: service_started
