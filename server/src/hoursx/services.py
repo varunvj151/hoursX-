@@ -22,6 +22,7 @@ from hoursx.sdk.manifest import PluginPermission
 from hoursx.tools.builtin import register_builtin_tools
 from hoursx.tools.executor import ToolExecutor
 from hoursx.tools.registry import ToolRegistry
+from hoursx.tools.mcp_adapter import MCPAdapter
 
 log = get_logger("services")
 
@@ -36,11 +37,22 @@ class AppServices:
     knowledge: KnowledgeEngine
     registry: ToolRegistry
     executor: ToolExecutor
+    mcp_adapter: MCPAdapter | None = None
 
     def sandbox_root(self) -> Path:
         root = Path(self.settings.workspace_root)
         root.mkdir(parents=True, exist_ok=True)
         return root
+
+    async def start(self) -> None:
+        if self.mcp_adapter:
+            tools = await self.mcp_adapter.start()
+            for t in tools:
+                self.registry.register(t)
+
+    async def stop(self) -> None:
+        if self.mcp_adapter:
+            await self.mcp_adapter.stop()
 
 
 def build_services(
@@ -69,6 +81,7 @@ def build_services(
         knowledge=KnowledgeEngine(router, settings.chunk_size_chars, settings.chunk_overlap_chars),
         registry=registry,
         executor=ToolExecutor(registry, default_timeout=settings.tool_timeout_seconds),
+        mcp_adapter=MCPAdapter(settings.mcp_servers) if settings.mcp_servers else None,
     )
 
 

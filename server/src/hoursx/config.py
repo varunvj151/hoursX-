@@ -8,7 +8,7 @@ reads environment variables directly. Values come from the environment (prefix
 from __future__ import annotations
 
 from functools import lru_cache
-from typing import Literal
+from typing import Any, Literal
 
 from pydantic import Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
@@ -67,6 +67,7 @@ class HoursXSettings(BaseSettings):
     # --- plugins ---
     plugin_dir: str = "./plugins"
     marketplace_index_url: str | None = None
+    mcp_servers: dict[str, dict[str, Any]] = Field(default_factory=dict)
 
     # --- observability ---
     log_level: str = "INFO"

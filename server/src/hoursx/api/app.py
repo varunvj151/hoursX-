@@ -37,10 +37,12 @@ def create_app(services: AppServices | None = None) -> FastAPI:
             configure_logging(settings.log_level, settings.log_json)
             services = build_services(settings)
         await services.db.create_all()
+        await services.start()
         app.state.services = services
         app.state.conductor = Conductor(services)
         yield
         await app.state.conductor.wait_for_inline_runs()
+        await services.stop()
         await services.db.dispose()
 
     app = FastAPI(
