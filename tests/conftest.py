@@ -32,6 +32,10 @@ def settings(tmp_path) -> HoursXSettings:
         plugin_dir=str(tmp_path / "plugins"),
         jwt_secret="test-secret",
         task_backend="inline",
+        # Inert until a channel is registered; named here so channel tests can
+        # route without rebuilding the whole service graph.
+        channel_workspace_slug="test-ws",
+        channel_agent_handle="assistant",
         model_aliases={
             "fast": "echo/any",
             "deep": "echo/any",

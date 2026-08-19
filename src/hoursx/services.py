@@ -10,6 +10,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from pathlib import Path
 
+from hoursx.channels.router import ChannelRegistry, build_registry
 from hoursx.config import HoursXSettings, get_settings
 from hoursx.db.engine import Database
 from hoursx.events import EventBus, build_event_bus
@@ -37,6 +38,7 @@ class AppServices:
     knowledge: KnowledgeEngine
     registry: ToolRegistry
     executor: ToolExecutor
+    channels: ChannelRegistry
     mcp_adapter: MCPAdapter | None = None
 
     def sandbox_root(self) -> Path:
@@ -81,6 +83,7 @@ def build_services(
         knowledge=KnowledgeEngine(router, settings.chunk_size_chars, settings.chunk_overlap_chars),
         registry=registry,
         executor=ToolExecutor(registry, default_timeout=settings.tool_timeout_seconds),
+        channels=build_registry(settings),
         mcp_adapter=MCPAdapter(settings.mcp_servers) if settings.mcp_servers else None,
     )
 

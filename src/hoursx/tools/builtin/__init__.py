@@ -1,11 +1,13 @@
 """Built-in tools shipped with the platform."""
 
+from hoursx.tools.builtin.change import register_change_tools
 from hoursx.tools.builtin.code import register_code_tools
 from hoursx.tools.builtin.delegate import register_delegate_tool
 from hoursx.tools.builtin.fs import register_fs_tools
 from hoursx.tools.builtin.git import register_git_tools
 from hoursx.tools.builtin.recall import register_recall_tools
 from hoursx.tools.builtin.shell import register_shell_tools
+from hoursx.tools.builtin.system import register_system_tools
 from hoursx.tools.builtin.web import register_web_tools
 from hoursx.tools.registry import ToolRegistry
 
@@ -18,5 +20,7 @@ def register_builtin_tools(registry: ToolRegistry) -> None:
     register_git_tools(registry)
     register_web_tools(registry)
     register_recall_tools(registry)
+    register_system_tools(registry)
+    register_change_tools(registry)
     register_code_tools(registry)
     register_delegate_tool(registry)

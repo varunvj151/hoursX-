@@ -39,10 +39,11 @@ dev = [
     "pytest-asyncio>=0.23",
     "pytest-cov>=5.0",
     "ruff>=0.5",
+    "reportlab>=4.0",
 ]
 
 [project.scripts]
-hoursx = "hoursx.cli:main"
+hoursx = "hoursx.cli.main:main"
 
 [project.urls]
 Documentation = "https://github.com/tedo001/hoursX-/tree/main/docs"
@@ -59,6 +60,7 @@ where = ["src"]
 hoursx = ["py.typed"]
 
 [tool.pytest.ini_options]
+pythonpath = ["src"]
 asyncio_mode = "auto"
 testpaths = ["tests"]
 addopts = "--strict-markers"

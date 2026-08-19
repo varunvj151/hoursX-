@@ -34,6 +34,9 @@ class AuditAction(StrEnum):
     AGENT_DELETED = "agent.deleted"
     APPROVAL_DECIDED = "approval.decided"
     RUN_CANCELLED = "run.cancelled"
+    CHANGE_APPLIED = "change.applied"
+    CHANGE_REVERTED = "change.reverted"
+    CHANGE_CONFIRMED = "change.confirmed"
     DOCUMENT_DELETED = "document.deleted"
 
 

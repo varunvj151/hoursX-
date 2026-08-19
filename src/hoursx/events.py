@@ -26,6 +26,9 @@ class EventType(StrEnum):
     RUN_AWAITING_APPROVAL = "run.awaiting_approval"
     RUN_FINISHED = "run.finished"
     APPROVAL_DECIDED = "approval.decided"
+    CHANGE_APPLIED = "change.applied"
+    CHANGE_VERIFIED = "change.verified"
+    CHANGE_REVERTED = "change.reverted"
     DOCUMENT_INGESTED = "document.ingested"
     SCHEDULE_FIRED = "schedule.fired"
 

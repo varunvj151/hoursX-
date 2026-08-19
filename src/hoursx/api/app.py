@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import asyncio
+import contextlib
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI, Request
@@ -13,6 +15,8 @@ from hoursx.api.routers import (
     admin,
     agents,
     auth,
+    changes,
+    channels,
     keys,
     knowledge,
     members,
@@ -22,6 +26,7 @@ from hoursx.api.routers import (
     sessions,
     ws,
 )
+from hoursx.channels.dispatch import ChannelDispatcher
 from hoursx.config import get_settings
 from hoursx.errors import HoursXError
 from hoursx.observability import configure_logging, new_request_id, request_id_var
@@ -44,7 +49,18 @@ def create_app(services: AppServices | None = None) -> FastAPI:
         await services.start()
         app.state.services = services
         app.state.conductor = Conductor(services)
+        # Only start dispatch when a channel exists: an idle deployment should
+        # not poll the database forever for replies it can never owe.
+        dispatcher = (
+            asyncio.create_task(ChannelDispatcher(services, services.channels).run_forever())
+            if len(services.channels)
+            else None
+        )
         yield
+        if dispatcher is not None:
+            dispatcher.cancel()
+            with contextlib.suppress(asyncio.CancelledError):
+                await dispatcher
         await app.state.conductor.wait_for_inline_runs()
         await services.stop()
         await services.db.dispose()
@@ -85,6 +101,8 @@ def create_app(services: AppServices | None = None) -> FastAPI:
 
     app.include_router(auth.router)
     app.include_router(agents.router)
+    app.include_router(changes.router)
+    app.include_router(channels.router)
     app.include_router(keys.router)
     app.include_router(members.router)
     app.include_router(sessions.router)

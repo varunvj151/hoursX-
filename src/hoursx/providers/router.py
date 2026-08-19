@@ -187,6 +187,10 @@ def build_default_router(settings: HoursXSettings) -> ModelRouter:
         providers["openai"] = OpenAICompatProvider(
             name="openai", base_url=settings.openai_base_url, api_key=settings.openai_api_key
         )
+    if settings.gemini_api_key:
+        from hoursx.providers.gemini import GeminiProvider
+
+        providers["gemini"] = GeminiProvider(settings.gemini_api_key)
     if settings.local_base_url:
         from hoursx.providers.openai_compat import OpenAICompatProvider
 

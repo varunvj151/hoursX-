@@ -34,3 +34,6 @@ plugins/
 # Coverage
 .coverage
 coverage.xml
+
+# Generated report (rebuild with: python scripts/build_report.py)
+HoursX-Engineering-Report.pdf
