@@ -1,0 +1,11 @@
+{
+  "name": "hoursx",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "npm --prefix console run dev",
+    "build": "npm --prefix console run build",
+    "start": "npm --prefix console run start",
+    "typecheck": "npm --prefix console run typecheck"
+  }
+}
